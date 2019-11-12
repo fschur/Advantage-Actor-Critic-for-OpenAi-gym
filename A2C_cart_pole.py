@@ -43,6 +43,7 @@ class Memory:
         self.rewards = []
         self.action_prob = []
         self.state_values = []
+        self.entropy = 0
 
     def calculate_data(self, gamma):
         # compute the discounted rewards
@@ -56,23 +57,25 @@ class Memory:
         disc_rewards = torch.Tensor(disc_rewards)
         disc_rewards = (disc_rewards - disc_rewards.mean()) / (disc_rewards.std() + 0.001)
 
-        return torch.stack(self.action_prob), torch.stack(self.state_values), disc_rewards
+        return torch.stack(self.action_prob), torch.stack(self.state_values), disc_rewards, self.entropy
 
     def reset(self):
         del self.rewards[:]
         del self.action_prob[:]
         del self.state_values[:]
+        self.entropy = 0
 
 
 def select_action(model, state, memory):
     state = torch.Tensor(state)
     probs, state_value = model(state)
-
+    entropy = -(probs*probs.log()).sum()
     # sample from the probability distribution given by the actor
     m = Categorical(probs)
     action = m.sample()
 
     # save the log-probabilities and the state_value
+    memory.entropy += entropy
     memory.action_prob.append(m.log_prob(action))
     memory.state_values.append(state_value)
 
@@ -80,13 +83,13 @@ def select_action(model, state, memory):
 
 
 def train(memory, optimizer, gamma):
-    probs, values, disc_rewards = memory.calculate_data(gamma)
+    probs, values, disc_rewards, entropy = memory.calculate_data(gamma)
 
     advantage = disc_rewards - values
 
     policy_loss = (-probs*advantage).mean()
     value_loss = 0.5 * advantage.pow(2).mean()
-    loss = policy_loss + value_loss
+    loss = policy_loss + value_loss + 0.001*entropy
 
     optimizer.zero_grad()
     loss.backward()
