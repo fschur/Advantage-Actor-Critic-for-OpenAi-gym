@@ -66,7 +66,7 @@ def train(memory, optimizer, gamma, eps):
     optimizer.step()
 
 
-def main(gamma=0.99, lr=1e-2, num_episodes=400, eps=0.001, seed=42, lr_step=100, lr_gamma=0.95, measure_step=100, 
+def main(gamma=0.99, lr=5e-3, num_episodes=400, eps=0.001, seed=42, lr_step=100, lr_gamma=0.9, measure_step=100, 
          measure_repeats=100, horizon=np.inf, hidden_dim=64, env_name='CartPole-v1', render=True):
     """
     :param gamma: reward discount factor
