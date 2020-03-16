@@ -66,9 +66,8 @@ def train(memory, optimizer, gamma, eps):
     optimizer.step()
 
 
-#cartpole: gamma=0.97, lr=3e-4, num_episodes=3000, eps=0.001, seed=42, render=True
-def main(gamma=0.99, lr=3e-3, num_episodes=3000, eps=0.001, seed=48, lr_step=100, lr_gamma=0.9,
-         measure_step=100, measure_repeats=100, horizon=np.inf, hidden_dim=64, env_name='LunarLanderContinuous-v2', render=True):
+def main(gamma=0.99, lr=1e-2, num_episodes=400, eps=0.001, seed=42, lr_step=100, lr_gamma=0.95, measure_step=100, 
+         measure_repeats=100, horizon=np.inf, hidden_dim=64, env_name='CartPole-v1', render=True):
     """
     :param gamma: reward discount factor
     :param lr: initial learning rate
